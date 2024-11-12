@@ -5,7 +5,8 @@
  * @format
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useState } from 'react';
 import type {PropsWithChildren} from 'react';
 import {
   SafeAreaView,
@@ -32,6 +33,7 @@ type SectionProps = PropsWithChildren<{
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
+  const [imagesUploaded, setImagesUploaded] = useState(false);
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -53,7 +55,15 @@ function App(): React.JSX.Element {
                 backgroundColor: isDarkMode ? Colors.black : Colors.white,
               }}>
                 <Text>Hello, World</Text>
-                <ImagePickerComponent />
+                <ImagePickerComponent {
+                  ...{
+                    onImageSelected: (isImageSelected: boolean, imageData: string) => {
+                      console.log('Image Selected:', isImageSelected, imageData);
+                      setImagesUploaded(isImageSelected);
+                    }
+                  }
+                } />
+
             </View>
           </ScrollView>
         </SafeAreaView>
