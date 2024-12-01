@@ -21,12 +21,12 @@ const ImagePickerComponent: React.FC<ImageUploadComponentProps> = ({onImageSelec
 
     return (
         <View>
-            <Text>Image Picker Component</Text>
+            {/* <Text>Image Picker Component</Text> */}
             <Button title="Select Image" onPress={ openImagePicker} />
             {images.length>0 && (
                 <>
                 <Image source={{uri: images[0].uri}} alt="Selected Image" 
-                style= {{width: 200, height: 200}}/>
+                style= {{width: 200, height: 200, alignSelf: "center"}}/>
                 </>
             )}
         </View>
