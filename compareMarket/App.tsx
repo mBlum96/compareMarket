@@ -17,6 +17,7 @@ import {
   Text,
   useColorScheme,
   View,
+  TextInput,
 } from 'react-native';
 
 import {
@@ -74,6 +75,25 @@ function App(): React.JSX.Element {
     }
   };
 
+  const handleCheckWalmart = async () => {
+    if (resultText) {
+      try {
+        const response = await fetch('http://localhost:8080/api/checkWalmart', {
+          method: 'POST',
+          body: JSON.stringify({text: resultText}),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const result = await response.json();
+        console.log('Walmart Result:', result);
+      } catch (error) {
+        console.error('Error checking Walmart:', error);
+      }
+    }
+  }
+
   return (
     <SafeAreaProvider>
       <NativeBaseProvider>
@@ -94,14 +114,44 @@ function App(): React.JSX.Element {
               />
               <Button title="Upload Image" onPress={handleUpload} disabled={!selectedImage} />
 
-              {resultText ? <Text>{resultText}</Text> : null}
+              {resultText ? <TextInput
+              style={styles.textInput}
+              value={resultText}
+              onChangeText={setResultText}
+              multiline={true}
+              scrollEnabled={true}
+              textAlignVertical='top'
+              /> : null}
+
+              <Button title="Check Walmart" onPress={handleCheckWalmart} disabled={!resultText} />
+              <Button title="Check Target" onPress={() => console.log('Check Target')}
+              disabled={!resultText} />
             </View>
           </ScrollView>
         </SafeAreaView>
       </NativeBaseProvider>
     </SafeAreaProvider>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f9f9f9',
+  },
+  textInput: {
+    alignSelf: 'center',
+    width: '80%',
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    fontSize: 16,
+    backgroundColor: '#fff',
+  },
+});
 
 
 export default App;

@@ -59,6 +59,7 @@ func main() {
 	}))
 
 	apiRouter.Post("/sendImageToProcess", http.HandlerFunc(apiCfg.imageProcessingHandler))
+	apiRouter.Post("/checkWalmart", http.HandlerFunc(apiCfg.fetchProductDetailsHandler))
 
 	server := http.Server{
 		Addr:    ":8080",

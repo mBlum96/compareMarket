@@ -12,7 +12,7 @@ import (
 func (cfg *apiConfig) imageProcessingHandler(w http.ResponseWriter, r *http.Request) {
 	cfg.fileServerHits++
 
-	// Parse the multipart form data (limit your max input length!)
+	// Parse the multipart
 	err := r.ParseMultipartForm(10 << 20) // 10 MB max memory
 	if err != nil {
 		http.Error(w, "Error parsing multipart form: "+err.Error(), http.StatusBadRequest)
@@ -35,7 +35,7 @@ func (cfg *apiConfig) imageProcessingHandler(w http.ResponseWriter, r *http.Requ
 		http.Error(w, "Error creating temporary file: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	defer os.Remove(tempFile.Name()) // Clean up the temporary file after processing
+	defer os.Remove(tempFile.Name())
 	defer tempFile.Close()
 
 	// Write the uploaded file to the temporary file
@@ -46,17 +46,17 @@ func (cfg *apiConfig) imageProcessingHandler(w http.ResponseWriter, r *http.Requ
 	}
 
 	// Execute Tesseract command-line tool
-	// The output will be sent to stdout
 	cmd := exec.Command("tesseract", tempFile.Name(), "stdout", "--psm", "6", "--oem", "3", "-l", "eng")
 	// Capture the output
 	var out bytes.Buffer
+	var errBuff bytes.Buffer
 	cmd.Stdout = &out
-	cmd.Stderr = &out // Capture stderr for error messages
+	cmd.Stderr = &errBuff
 
 	// Run the command
 	err = cmd.Run()
 	if err != nil {
-		http.Error(w, "Error executing Tesseract: "+out.String(), http.StatusInternalServerError)
+		http.Error(w, "Error executing Tesseract: "+errBuff.String(), http.StatusInternalServerError)
 		return
 	}
 
