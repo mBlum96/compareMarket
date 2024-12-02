@@ -9,7 +9,7 @@ import (
 	"net/url"
 )
 
-const apiKey = "mykey"                                  // Replace with your actual API key
+const apiKey = ""                                       // Replace with your actual API key
 const apiURL = "https://data.unwrangle.com/api/getter/" // Correct endpoint
 
 type Product struct {
@@ -38,6 +38,8 @@ func (cfg *apiConfig) fetchProductDetailsHandler(w http.ResponseWriter, r *http.
 		http.Error(w, fmt.Sprintf("Failed to fetch product details: %v", err), http.StatusInternalServerError)
 		return
 	}
+
+	fmt.Printf("Product: %+v\n", product) // Debugging
 
 	// Respond with the product details in JSON format
 	w.Header().Set("Content-Type", "application/json")
