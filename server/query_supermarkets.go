@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 const apiKey = ""                                       // Replace with your actual API key
@@ -19,31 +20,52 @@ type Product struct {
 
 func (cfg *apiConfig) fetchProductDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("fetchProductDetailsHandler called") // Debugging
+
+	// Read the request body
 	bodyBytes, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Failed to read request body: %v", err), http.StatusInternalServerError)
 		fmt.Printf("Failed to read request body: %v\n", err) // Debugging
 		return
 	}
+	fmt.Printf("Request body: %s\n", string(bodyBytes)) // Debugging
+
 	var reqBody struct {
+		Texts []string `json:"texts"`
+	}
+	var singleText struct {
 		Text string `json:"text"`
 	}
-	if err := json.Unmarshal(bodyBytes, &reqBody); err != nil {
+
+	// Try to unmarshal as an array of texts
+	if err := json.Unmarshal(bodyBytes, &singleText); err != nil {
 		http.Error(w, fmt.Sprintf("Failed to parse request body: %v", err), http.StatusBadRequest)
 		fmt.Printf("Failed to parse request body: %v\n", err) // Debugging
 		return
 	}
-	product, err := fetchProductDetails(reqBody.Text)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to fetch product details: %v", err), http.StatusInternalServerError)
-		return
+	reqBody.Texts = strings.Split(singleText.Text, "\n")
+	fmt.Printf("Parsed texts: %+v\n", reqBody.Texts) // Debugging
+
+	var results []Product
+	for _, text := range reqBody.Texts {
+		if text == "" {
+			fmt.Println("Skipping empty text") // Debugging
+			continue
+		}
+		fmt.Printf("Processing text: %s\n", text) // Debugging
+		product, err := fetchProductDetails(text)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Failed to fetch product details: %v", err), http.StatusInternalServerError)
+			return
+		}
+		results = append(results, *product)
 	}
 
-	fmt.Printf("Product: %+v\n", product) // Debugging
+	fmt.Printf("Products: %+v\n", results) // Debugging
 
-	// Respond with the product details in JSON format
+	// Respond with the aggregated product details in JSON format
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(product); err != nil {
+	if err := json.NewEncoder(w).Encode(results); err != nil {
 		http.Error(w, fmt.Sprintf("Failed to encode response: %v", err), http.StatusInternalServerError)
 	}
 }

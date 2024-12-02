@@ -38,7 +38,7 @@ function App(): React.JSX.Element {
   const [imagesUploaded, setImagesUploaded] = useState(false);
   const [resultText, setResultText] = useState('');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [walmartResult, setWalmartResult] = useState<{name: string; price: string} | null>(null);
+  const [walmartResult, setWalmartResult] = useState<{name: string; price: string}[]>([]);
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -89,11 +89,18 @@ function App(): React.JSX.Element {
 
         const result = await response.json();
         console.log('Walmart Result:', result);
+
         setWalmartResult(result);
       } catch (error) {
         console.error('Error checking Walmart:', error);
       }
     }
+  }
+
+  const calculateTotal = (products: {name: string; price: string}[]) => {
+    return products.reduce((total, product) => {
+      return total + parseFloat(product.price);
+    }, 0);
   }
 
   return (
@@ -126,13 +133,26 @@ function App(): React.JSX.Element {
               /> : null}
 
               <Button title="Check Walmart" onPress={handleCheckWalmart} disabled={!resultText} />
-              {walmartResult ? <TextInput 
-              style={styles.textInput}
-              value={`Product name: ${walmartResult.name}\n Price: ${walmartResult.price}`}
-              multiline={true}
-              scrollEnabled={true}
-              textAlignVertical='top'
-              /> : null}
+              {walmartResult.length>0 &&(
+                <View>
+                  {walmartResult.map((product, index) => (
+                    // <View key={index}>
+                    //   <Text>Name: {product.name}</Text>
+                    //   <Text>Price: ${product.price}</Text>
+                    // </View>
+                    <TextInput
+                      key={index}
+                      style={styles.textInput}
+                      value={`Name: ${product.name}\nPrice: $${product.price}`}
+                      multiline={true}
+                      scrollEnabled={true}
+                      textAlignVertical='top'
+                      editable={false}
+                    />
+                  ))}
+                  <Text style={{alignSelf: 'center'}}>Total: ${calculateTotal(walmartResult)}</Text>  
+                </View>
+              )}
               <Button title="Check Target" onPress={() => console.log('Check Target')}
               disabled={!resultText} />
             </View>
