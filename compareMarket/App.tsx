@@ -38,7 +38,7 @@ function App(): React.JSX.Element {
   const [imagesUploaded, setImagesUploaded] = useState(false);
   const [resultText, setResultText] = useState('');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [walmartResult, setWalmartResult] = useState<string | null>(null);
+  const [walmartResult, setWalmartResult] = useState<{name: string; price: string} | null>(null);
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -89,7 +89,7 @@ function App(): React.JSX.Element {
 
         const result = await response.json();
         console.log('Walmart Result:', result);
-        setWalmartResult(result.text);
+        setWalmartResult(result);
       } catch (error) {
         console.error('Error checking Walmart:', error);
       }
@@ -128,7 +128,7 @@ function App(): React.JSX.Element {
               <Button title="Check Walmart" onPress={handleCheckWalmart} disabled={!resultText} />
               {walmartResult ? <TextInput 
               style={styles.textInput}
-              value={walmartResult}
+              value={`Product name: ${walmartResult.name}\n Price: ${walmartResult.price}`}
               multiline={true}
               scrollEnabled={true}
               textAlignVertical='top'
