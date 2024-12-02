@@ -9,8 +9,8 @@ import (
 	"net/url"
 )
 
-const apiKey = "REMOVED" // Replace with your actual API key
-const apiURL = "https://data.unwrangle.com/api/getter/"   // Correct endpoint
+const apiKey = "mykey"                                  // Replace with your actual API key
+const apiURL = "https://data.unwrangle.com/api/getter/" // Correct endpoint
 
 type Product struct {
 	Name  string  `json:"name"`
@@ -33,14 +33,6 @@ func (cfg *apiConfig) fetchProductDetailsHandler(w http.ResponseWriter, r *http.
 		fmt.Printf("Failed to parse request body: %v\n", err) // Debugging
 		return
 	}
-	// bodyBytes, err := io.ReadAll(r.Body)
-	// if err != nil {
-	// 	http.Error(w, fmt.Sprintf("Failed to read request body: %v", err), http.StatusInternalServerError)
-	// 	fmt.Printf("Failed to read request body: %v\n", err) // Debugging
-	// 	return
-	// }
-	// fmt.Printf("request body: %v\n", bodyBytes) // Debugging
-	// Parse the UPC from the POST request body
 	product, err := fetchProductDetails(reqBody.Text)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Failed to fetch product details: %v", err), http.StatusInternalServerError)
