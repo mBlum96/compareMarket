@@ -27,6 +27,7 @@ import {
 import ImagePickerComponent from './src/components/ImagePickerComponent';
 import { NativeBaseProvider } from 'native-base';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { set } from 'mongoose';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -39,6 +40,8 @@ function App(): React.JSX.Element {
   const [resultText, setResultText] = useState('');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [walmartResult, setWalmartResult] = useState<{name: string; price: string}[]>([]);
+  const [targetResult, setTargetResult] = useState<{name: string; price: string}[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -78,6 +81,7 @@ function App(): React.JSX.Element {
 
   const handleCheckWalmart = async () => {
     if (resultText) {
+      setLoading(true);
       try {
         const response = await fetch('http://localhost:8080/api/checkWalmart', {
           method: 'POST',
@@ -95,7 +99,32 @@ function App(): React.JSX.Element {
         console.error('Error checking Walmart:', error);
       }
     }
+    setLoading(false);
   }
+
+  const handleCheckTarget = async () => {
+    if (resultText) {
+      setLoading(true);
+      try {
+        const response = await fetch('http://localhost:8080/api/checkTarget', {
+          method: 'POST',
+          body: JSON.stringify({text: resultText}),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const result = await response.json();
+        console.log('Target Result:', result);
+
+        setTargetResult(result);
+      } catch (error) {
+        console.error('Error checking Target:', error);
+      }
+    }
+    setLoading(false);
+  }
+    
 
   const calculateTotal = (products: {name: string; price: string}[]) => {
     return products.reduce((total, product) => {
@@ -150,11 +179,35 @@ function App(): React.JSX.Element {
                       editable={false}
                     />
                   ))}
-                  <Text style={{alignSelf: 'center'}}>Total: ${calculateTotal(walmartResult)}</Text>  
+                  <Text style={{alignSelf: 'center'}}>Total: ${calculateTotal(walmartResult).toFixed(2)}</Text>  
                 </View>
               )}
-              <Button title="Check Target" onPress={() => console.log('Check Target')}
-              disabled={!resultText} />
+              <Button title="Check Target" onPress={
+                handleCheckTarget
+                } disabled={!resultText} />
+                {!targetResult.length && resultText && (
+                loading && <Text style={{alignSelf: 'center'}}>Loading...</Text>
+                )}
+              {targetResult.length>0 &&(
+                <View>
+                  {targetResult.map((product, index) => (
+                    // <View key={index}>
+                    //   <Text>Name: {product.name}</Text>
+                    //   <Text>Price: ${product.price}</Text>
+                    // </View>
+                    <TextInput
+                      key={index}
+                      style={styles.textInput}
+                      value={`Name: ${product.name}\nPrice: $${product.price}`}
+                      multiline={true}
+                      scrollEnabled={true}
+                      textAlignVertical='top'
+                      editable={false}
+                    />
+                  ))}
+                  <Text style={{alignSelf: 'center'}}>Total: ${calculateTotal(targetResult)}</Text>  
+                </View>
+              )}
             </View>
           </ScrollView>
         </SafeAreaView>

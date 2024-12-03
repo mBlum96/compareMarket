@@ -59,7 +59,12 @@ func main() {
 	}))
 
 	apiRouter.Post("/sendImageToProcess", http.HandlerFunc(apiCfg.imageProcessingHandler))
-	apiRouter.Post("/checkWalmart", http.HandlerFunc(apiCfg.fetchProductDetailsHandler))
+	apiRouter.Post("/checkWalmart", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		apiCfg.fetchProductDetailsHandler(w, r, "walmart")
+	}))
+	apiRouter.Post("/checkTarget", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		apiCfg.fetchProductDetailsHandler(w, r, "target")
+	}))
 
 	server := http.Server{
 		Addr:    ":8080",

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -18,7 +17,7 @@ type Product struct {
 	Price float64 `json:"price"`
 }
 
-func (cfg *apiConfig) fetchProductDetailsHandler(w http.ResponseWriter, r *http.Request) {
+func (cfg *apiConfig) fetchProductDetailsHandler(w http.ResponseWriter, r *http.Request, shop string) {
 	fmt.Println("fetchProductDetailsHandler called") // Debugging
 
 	// Read the request body
@@ -53,7 +52,7 @@ func (cfg *apiConfig) fetchProductDetailsHandler(w http.ResponseWriter, r *http.
 			continue
 		}
 		fmt.Printf("Processing text: %s\n", text) // Debugging
-		product, err := fetchProductDetails(text)
+		product, err := fetchProductDetails(text, shop)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Failed to fetch product details: %v", err), http.StatusInternalServerError)
 			return
@@ -70,10 +69,16 @@ func (cfg *apiConfig) fetchProductDetailsHandler(w http.ResponseWriter, r *http.
 	}
 }
 
-func fetchProductDetails(searchTerm string) (*Product, error) {
+func fetchProductDetails(searchTerm string, shop string) (*Product, error) {
 	fmt.Println("got here") // Debugging
 	client := &http.Client{}
-	reqURL := fmt.Sprintf("%s?platform=walmart_search&search=%s&page=1&api_key=%s", apiURL, url.QueryEscape(searchTerm), apiKey)
+	var reqURL string
+	if shop == "walmart" {
+		reqURL = fmt.Sprintf("%s?platform=walmart_search&search=%s&page=1&api_key=%s", apiURL, url.QueryEscape(searchTerm), apiKey)
+	} else {
+		//currently supporting target and walmart only
+		reqURL = fmt.Sprintf("%s?platform=target_search&search=%s&page=1&api_key=%s", apiURL, url.QueryEscape(searchTerm), apiKey)
+	}
 	req, err := http.NewRequest("GET", reqURL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %v", err)
@@ -87,11 +92,11 @@ func fetchProductDetails(searchTerm string) (*Product, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		body, _ := ioutil.ReadAll(resp.Body)
+		body, _ := io.ReadAll(resp.Body)
 		return nil, fmt.Errorf("API error: %s, Response: %s", resp.Status, string(body))
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read response body: %v", err)
 	}
