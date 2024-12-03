@@ -1,10 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React, { useEffect } from 'react';
 import { useState } from 'react';
 import type {PropsWithChildren} from 'react';
@@ -53,6 +46,7 @@ function App(): React.JSX.Element {
     setSelectedImage(imageData);
   };
 
+  //send image to the server to be processed by the OCR
   const handleUpload = async () => {
     if (selectedImage) {
       try {
@@ -79,6 +73,7 @@ function App(): React.JSX.Element {
     }
   };
 
+  //send the text to the server and get the current prices from Walmart
   const handleCheckWalmart = async () => {
     if (resultText) {
       setLoading(true);
@@ -102,6 +97,7 @@ function App(): React.JSX.Element {
     setLoading(false);
   }
 
+  //send the text to the server and get the current prices from Target
   const handleCheckTarget = async () => {
     if (resultText) {
       setLoading(true);
@@ -125,7 +121,7 @@ function App(): React.JSX.Element {
     setLoading(false);
   }
     
-
+  //calculate the total price of the products
   const calculateTotal = (products: {name: string; price: string}[]) => {
     return products.reduce((total, product) => {
       return total + parseFloat(product.price);
@@ -165,10 +161,6 @@ function App(): React.JSX.Element {
               {walmartResult.length>0 &&(
                 <View>
                   {walmartResult.map((product, index) => (
-                    // <View key={index}>
-                    //   <Text>Name: {product.name}</Text>
-                    //   <Text>Price: ${product.price}</Text>
-                    // </View>
                     <TextInput
                       key={index}
                       style={styles.textInput}
@@ -191,10 +183,6 @@ function App(): React.JSX.Element {
               {targetResult.length>0 &&(
                 <View>
                   {targetResult.map((product, index) => (
-                    // <View key={index}>
-                    //   <Text>Name: {product.name}</Text>
-                    //   <Text>Price: ${product.price}</Text>
-                    // </View>
                     <TextInput
                       key={index}
                       style={styles.textInput}
