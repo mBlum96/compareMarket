@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useState } from 'react';
-import type {PropsWithChildren} from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -20,16 +19,9 @@ import {
 import ImagePickerComponent from './src/components/ImagePickerComponent';
 import { NativeBaseProvider } from 'native-base';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { set } from 'mongoose';
-
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
-  const [imagesUploaded, setImagesUploaded] = useState(false);
   const [resultText, setResultText] = useState('');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [walmartResult, setWalmartResult] = useState<{name: string; price: string}[]>([]);
@@ -42,7 +34,6 @@ function App(): React.JSX.Element {
 
   const handleImageSelected = (isImageSelected: boolean, imageData: string) => {
     console.log('Image Selected:', isImageSelected, imageData);
-    setImagesUploaded(isImageSelected);
     setSelectedImage(imageData);
   };
 

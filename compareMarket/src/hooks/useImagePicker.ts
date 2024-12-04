@@ -1,7 +1,6 @@
 import { Alert } from 'react-native';
-import {Asset, ImagePickerResponse, launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import {Asset, ImagePickerResponse, launchImageLibrary} from 'react-native-image-picker';
 import {useState} from 'react';
-import { set } from 'mongoose';
 
 const useImagePicker = () => {
 

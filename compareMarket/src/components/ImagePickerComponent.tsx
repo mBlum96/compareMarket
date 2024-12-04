@@ -1,8 +1,7 @@
 import { Image } from 'native-base';
 import useImagePicker from '../hooks/useImagePicker';
 import React, { useEffect } from 'react';
-import { useState } from 'react';
-import { View, Text, Button } from 'react-native';
+import { View, Button } from 'react-native';
 
 interface ImageUploadComponentProps {
     onImageSelected: (isImageSelected: boolean, imageData: string) => void;

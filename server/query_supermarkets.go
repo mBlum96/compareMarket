@@ -117,7 +117,3 @@ func fetchProductDetails(searchTerm string, shop string) (*Product, error) {
 
 	return &result.Results[0], nil
 }
-
-func prepareDataForQuery(searchTerm string) string {
-	return ""
-}
